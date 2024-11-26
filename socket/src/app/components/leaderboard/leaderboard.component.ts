@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { SocketService } from '../../services/socket.service'; // Asegúrate de importar el servicio
-import { Subscription } from 'rxjs';
+import { first, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,12 +16,17 @@ export class LeaderboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private socketService: SocketService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private appRef: ApplicationRef
   ) {}
 
   ngOnInit(): void {
     // Conectar al socket cuando el componente se inicie
-    this.socketService.connect();
+    // this.socketService.connect();
+
+    this.appRef.isStable.pipe(first((isStable) => isStable)).subscribe(() => {
+      this.socketService.connect();
+    })
 
     // Escuchar el evento de actualización del leaderboard
     this.socketService.on('leaderboard-update', (data) => {

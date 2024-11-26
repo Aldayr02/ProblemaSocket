@@ -12,16 +12,18 @@ export class SocketService {
     // Reemplaza con la URL de tu servidor Express y el puerto
     this.socket = io('http://localhost:3000', {
       transports: ['websocket'], // Se asegura de usar WebSocket para la comunicación
+      autoConnect: false
     });
 
     // Escuchar eventos de conexión y error
     this.socket.on('connect_error', (error) => {
       console.error('Error de conexión al servidor de sockets:');
       this.connectionError = true; // Marcamos que ocurrió un error de conexión
-
-      alert(
-        'No se pudo conectar al servidor de sockets. Intenta de nuevo más tarde.'
-      );
+      if (typeof window !== 'undefined') {
+        alert(
+          'No se pudo conectar al servidor de sockets. Intenta de nuevo más tarde.'
+        );
+      }
     });
 
     this.socket.on('connect_timeout', (timeout) => {
